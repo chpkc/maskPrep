@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/types.ts","./src/vite-env.d.ts","./src/components/calendarview.tsx","./src/components/dashboard.tsx","./src/components/deadlinecountdown.tsx","./src/components/pomodorotimer.tsx"],"version":"5.6.3"}
+{"root":["./src/app.tsx","./src/main.tsx","./src/types.ts","./src/vite-env.d.ts","./src/components/calendarview.tsx","./src/components/dashboard.tsx","./src/components/deadlinecountdown.tsx","./src/components/minitimer.tsx","./src/components/pomodorotimer.tsx","./src/context/timercontext.tsx"],"version":"5.6.3"}

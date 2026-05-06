@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { BookOpen, Calendar, Clock, Moon, Sun, Target } from 'lucide-react'
+import { TimerProvider } from './context/TimerContext'
 import Dashboard from './components/Dashboard'
 import CalendarView from './components/CalendarView'
 import PomodoroTimer from './components/PomodoroTimer'
+import MiniTimer from './components/MiniTimer'
 import DeadlineCountdown from './components/DeadlineCountdown'
 import type { Subject, StudyPlan } from './types'
 
@@ -33,7 +35,7 @@ function App() {
     return saved ? JSON.parse(saved) : []
   })
   
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'calendar' | 'timer'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'calendar' | 'timer' | 'mini-timer'>('dashboard')
 
   useEffect(() => {
     localStorage.setItem('mesk-subjects', JSON.stringify(subjects))
@@ -55,7 +57,8 @@ function App() {
   const toggleTheme = () => setDarkMode(!darkMode)
 
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-900">
+    <TimerProvider>
+      <div className="min-h-screen bg-stone-50 dark:bg-stone-900">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-stone-50/80 dark:bg-stone-900/80 backdrop-blur-sm border-b border-stone-200 dark:border-stone-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -121,6 +124,17 @@ function App() {
               <Clock className="w-4 h-4" />
               <span className="hidden sm:inline">Помодоро</span>
             </button>
+            <button
+              onClick={() => setActiveTab('mini-timer')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ease-out hover:scale-105 active:scale-95 ${
+                activeTab === 'mini-timer'
+                  ? 'bg-stone-800 text-stone-50 dark:bg-stone-100 dark:text-stone-800'
+                  : 'text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'
+              }`}
+            >
+              <Target className="w-4 h-4" />
+              <span className="hidden sm:inline">Мини</span>
+            </button>
           </div>
         </div>
       </nav>
@@ -135,9 +149,11 @@ function App() {
             <CalendarView studyPlans={studyPlans} setStudyPlans={setStudyPlans} subjects={subjects} />
           )}
           {activeTab === 'timer' && <PomodoroTimer />}
+        {activeTab === 'mini-timer' && <MiniTimer />}
         </div>
       </main>
     </div>
+    </TimerProvider>
   )
 }
 

@@ -1,71 +1,25 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useTimer } from '../context/TimerContext'
 import { Play, Pause, RotateCcw, Settings, Volume2, VolumeX } from 'lucide-react'
 import type { TimerMode } from '../types'
 
-const DEFAULT_TIMES = { work: 25, shortBreak: 5, longBreak: 15 }
-
 export default function PomodoroTimer() {
-  const [mode, setMode] = useState<TimerMode>('work')
-  const [timeLeft, setTimeLeft] = useState(DEFAULT_TIMES.work * 60)
-  const [isRunning, setIsRunning] = useState(false)
-  const [customTimes, setCustomTimes] = useState(DEFAULT_TIMES)
-  const [showSettings, setShowSettings] = useState(false)
-  const [soundEnabled, setSoundEnabled] = useState(true)
-  const [completedSessions, setCompletedSessions] = useState(0)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  useEffect(() => {
-    audioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmFgU7k9n1unEiBC13yO/eizEIHWq+8+OWT')
-  }, [])
-
-  const playSound = useCallback(() => {
-    if (soundEnabled && audioRef.current) {
-      audioRef.current.currentTime = 0
-      audioRef.current.play().catch(() => {})
-    }
-  }, [soundEnabled])
-
-  useEffect(() => {
-    if (isRunning && timeLeft > 0) {
-      intervalRef.current = setInterval(() => {
-        setTimeLeft(prev => prev - 1)
-      }, 1000)
-    } else if (timeLeft === 0) {
-      setIsRunning(false)
-      playSound()
-      if (mode === 'work') {
-        setCompletedSessions(prev => prev + 1)
-        setMode(completedSessions % 4 === 3 ? 'longBreak' : 'shortBreak')
-        setTimeLeft((completedSessions % 4 === 3 ? customTimes.longBreak : customTimes.shortBreak) * 60)
-      } else {
-        setMode('work')
-        setTimeLeft(customTimes.work * 60)
-      }
-    }
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [isRunning, timeLeft, mode, customTimes, completedSessions, playSound])
-
-  const toggleTimer = () => setIsRunning(!isRunning)
-  
-  const resetTimer = () => {
-    setIsRunning(false)
-    setTimeLeft(customTimes[mode] * 60)
-  }
-
-  const switchMode = (newMode: TimerMode) => {
-    setMode(newMode)
-    setTimeLeft(customTimes[newMode] * 60)
-    setIsRunning(false)
-  }
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-  }
-
-  const progress = ((customTimes[mode] * 60 - timeLeft) / (customTimes[mode] * 60)) * 100
+  const {
+    mode,
+    timeLeft,
+    isRunning,
+    customTimes,
+    soundEnabled,
+    completedSessions,
+    showSettings,
+    toggleTimer,
+    resetTimer,
+    switchMode,
+    setCustomTimes,
+    setSoundEnabled,
+    setShowSettings,
+    formatTime,
+    progress
+  } = useTimer()
 
   return (
     <div className="max-w-md mx-auto">
@@ -112,7 +66,7 @@ export default function PomodoroTimer() {
             {(['work', 'shortBreak', 'longBreak'] as TimerMode[]).map(m => (
               <div key={m}>
                 <label className="block text-xs text-stone-500 mb-1">{m === 'work' ? 'Работа' : m === 'shortBreak' ? 'Перерыв' : 'Длинный'}</label>
-                <input type="number" value={customTimes[m]} onChange={(e) => setCustomTimes(prev => ({ ...prev, [m]: Math.max(1, parseInt(e.target.value) || 1) }))} className="w-full px-3 py-2 text-sm bg-stone-50 dark:bg-stone-700 border border-stone-200 dark:border-stone-600 rounded-lg text-center text-stone-800 dark:text-stone-100" />
+                <input type="number" value={customTimes[m]} onChange={(e) => setCustomTimes((prev) => ({ ...prev, [m]: Math.max(1, parseInt(e.target.value) || 1) }))} className="w-full px-3 py-2 text-sm bg-stone-50 dark:bg-stone-700 border border-stone-200 dark:border-stone-600 rounded-lg text-center text-stone-800 dark:text-stone-100" />
               </div>
             ))}
           </div>
