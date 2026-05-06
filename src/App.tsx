@@ -35,7 +35,7 @@ function App() {
     return saved ? JSON.parse(saved) : []
   })
   
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'calendar' | 'timer' | 'mini-timer'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'calendar' | 'timer'>('dashboard')
 
   useEffect(() => {
     localStorage.setItem('mesk-subjects', JSON.stringify(subjects))
@@ -124,17 +124,6 @@ function App() {
               <Clock className="w-4 h-4" />
               <span className="hidden sm:inline">Помодоро</span>
             </button>
-            <button
-              onClick={() => setActiveTab('mini-timer')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ease-out hover:scale-105 active:scale-95 ${
-                activeTab === 'mini-timer'
-                  ? 'bg-stone-800 text-stone-50 dark:bg-stone-100 dark:text-stone-800'
-                  : 'text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'
-              }`}
-            >
-              <Target className="w-4 h-4" />
-              <span className="hidden sm:inline">Мини</span>
-            </button>
           </div>
         </div>
       </nav>
@@ -149,7 +138,7 @@ function App() {
             <CalendarView studyPlans={studyPlans} setStudyPlans={setStudyPlans} subjects={subjects} />
           )}
           {activeTab === 'timer' && <PomodoroTimer />}
-        {activeTab === 'mini-timer' && <MiniTimer />}
+        {activeTab !== 'timer' && <MiniTimer />}
         </div>
       </main>
     </div>
